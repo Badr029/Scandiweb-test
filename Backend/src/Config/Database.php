@@ -19,11 +19,12 @@ class Database
 {
     private static ?PDO $connection = null;
     
-    private static string $host = 'localhost';
-    private static string $database = 'scandiweb_test';
-    private static string $username = 'root';
-    private static string $password = 'root';
-    private static int $port = 3308;
+    // InfinityFree Production Database Configuration
+    private static string $host = 'sql309.infinityfree.com';
+    private static string $database = 'if0_39425959_scandiweb_test';
+    private static string $username = 'if0_39425959';
+    private static string $password = 'YOUR_VPANEL_PASSWORD'; // TODO: Replace with your actual vPanel password
+    private static int $port = 3306; // Standard MySQL port
 
     /**
      * Get database connection instance
