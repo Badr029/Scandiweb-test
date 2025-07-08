@@ -55,12 +55,20 @@ htdocs/
     │   ├── Controller/
     │   │   └── GraphQL.php
     │   └── Models/
+    ├── vendor/              ⚠️ CRITICAL - PHP dependencies
+    │   ├── autoload.php
+    │   ├── composer/
+    │   ├── nikic/
+    │   ├── webonyx/
+    │   └── ... (other dependencies)
     ├── composer.json
     ├── composer.lock
     ├── database_schema.sql
     ├── data.json
     └── .htaccess
 ```
+
+⚠️ **IMPORTANT**: The `vendor` folder contains all PHP dependencies installed by Composer (FastRoute, GraphQL libraries, etc.). Without it, your backend will not work!
 
 ## 🚀 Deployment Checklist
 
