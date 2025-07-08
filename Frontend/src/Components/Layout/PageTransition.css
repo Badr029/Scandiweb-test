@@ -1,0 +1,125 @@
+.page-transition {
+  width: 100%;
+  min-height: calc(100vh - 80px); /* Account for header height */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fade transition animations */
+.page-transition.fadeIn {
+  animation: fadeSlideIn 0.5s ease-out forwards;
+}
+
+.page-transition.fadeOut {
+  animation: fadeSlideOut 0.3s ease-in forwards;
+}
+
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeSlideOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+/* Smooth transition for page content */
+.page-transition > * {
+  transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+}
+
+/* Enhanced transitions for specific elements */
+.page-transition .products-grid {
+  /* Let the CategoryPage.css handle product grid animations */
+  transition: none;
+}
+
+.page-transition .product-details,
+.page-transition .cart-content {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Don't override product card animations - let them handle their own transitions */
+.page-transition .product-card {
+  /* Product cards have their own animations in CategoryPage.css and ProductCard.css */
+  animation: none !important;
+}
+
+/* Smooth loading states */
+.page-transition .loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Smooth transition for page titles */
+.page-transition .category-title,
+.page-transition .product-brand,
+.page-transition .cart-title {
+  /* Let individual components handle their own title animations */
+  animation: none;
+}
+
+/* Error and no-products states */
+.page-transition .error,
+.page-transition .no-products {
+  animation: fadeIn 0.5s ease-out 0.3s forwards;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth scrolling enhancement */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Disable transitions for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .page-transition,
+  .page-transition.fadeIn,
+  .page-transition.fadeOut,
+  .page-transition > *,
+  .page-transition .error,
+  .page-transition .no-products {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .page-transition {
+    opacity: 1;
+    transform: none;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+} 

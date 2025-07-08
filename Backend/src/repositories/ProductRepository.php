@@ -345,11 +345,9 @@ class ProductRepository
         $prices = $this->loadProductPrices($product->getId());
         $product->setPrices($prices);
         
-        // Load attributes (if configurable product)
-        if ($product instanceof ConfigurableProduct) {
-            $attributes = $this->loadProductAttributes($product->getId());
-            $product->setAttributes($attributes);
-        }
+        // Load attributes for all products (empty array for simple products)
+        $attributes = $this->loadProductAttributes($product->getId());
+        $product->setAttributes($attributes);
     }
 
     /**
@@ -409,7 +407,7 @@ class ProductRepository
             
             $attributesData[$attributeId]['items'][] = [
                 'id' => $row['item_id'],
-                'displayValue' => $row['display_value'],
+                'display_value' => $row['display_value'],
                 'value' => $row['value']
             ];
         }

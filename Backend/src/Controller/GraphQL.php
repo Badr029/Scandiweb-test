@@ -30,11 +30,12 @@ class GraphQL
     private static CategoryRepository $categoryRepository;
 
     /**
-     * Handle incoming GraphQL requests and return JSON response
+     * Handle GraphQL requests from HTTP or direct calls
      * 
-     * @return string JSON formatted response
+     * @param array|null $directInput Direct input for testing (optional)
+     * @return string JSON response
      */
-    public static function handle(): string
+    public static function handle(?array $directInput = null): string
     {
         try {
             // Initialize repositories
@@ -145,14 +146,27 @@ class GraphQL
                 ->setMutation($mutationType)
             );
         
-            // Handle GraphQL request
-            $rawInput = file_get_contents('php://input');
-            if ($rawInput === false) {
-                throw new RuntimeException('Failed to get php://input');
+            // Handle input - either from direct call or HTTP request
+            if ($directInput !== null) {
+                // Direct call (for testing)
+                $input = $directInput;
+            } else {
+                // HTTP request
+                $rawInput = file_get_contents('php://input');
+                if ($rawInput === false) {
+                    throw new RuntimeException('Failed to get php://input');
+                }
+                $input = json_decode($rawInput, true);
+                if ($input === null) {
+                    throw new RuntimeException('Invalid JSON in request body');
+                }
             }
-        
-            $input = json_decode($rawInput, true);
-            $query = $input['query'];
+            
+            $query = $input['query'] ?? null;
+            if ($query === null) {
+                throw new RuntimeException('No query provided');
+            }
+            
             $variableValues = $input['variables'] ?? null;
         
             // Execute GraphQL query
@@ -167,7 +181,11 @@ class GraphQL
             ];
         }
 
-        header('Content-Type: application/json; charset=UTF-8');
+        // Only set headers if we're in an HTTP context (not testing)
+        if ($directInput === null && !headers_sent()) {
+            header('Content-Type: application/json; charset=UTF-8');
+        }
+        
         return json_encode($output);
     }
 
@@ -182,16 +200,34 @@ class GraphQL
             'name' => 'Category',
             'description' => 'Product category',
             'fields' => [
-                'id' => ['type' => Type::id()],
-                'name' => ['type' => Type::nonNull(Type::string())],
-                'type' => ['type' => Type::nonNull(Type::string())],
-                'displayName' => ['type' => Type::nonNull(Type::string())],
-                'canContainProducts' => ['type' => Type::nonNull(Type::boolean())],
-                'products' => [
-                    'type' => Type::listOf(self::getProductType()),
-                    'description' => 'Products in this category',
+                'id' => [
+                    'type' => Type::id(),
                     'resolve' => function($category) {
-                        return self::$productRepository->findByCategory($category->getName());
+                        return $category->getId();
+                    }
+                ],
+                'name' => [
+                    'type' => Type::nonNull(Type::string()),
+                    'resolve' => function($category) {
+                        return $category->getName();
+                    }
+                ],
+                'type' => [
+                    'type' => Type::nonNull(Type::string()),
+                    'resolve' => function($category) {
+                        return $category->getType();
+                    }
+                ],
+                'displayName' => [
+                    'type' => Type::nonNull(Type::string()),
+                    'resolve' => function($category) {
+                        return $category->getDisplayName();
+                    }
+                ],
+                'canContainProducts' => [
+                    'type' => Type::nonNull(Type::boolean()),
+                    'resolve' => function($category) {
+                        return $category->canContainProducts();
                     }
                 ]
             ]
@@ -209,22 +245,60 @@ class GraphQL
             'name' => 'Product',
             'description' => 'Product with polymorphic behavior',
             'fields' => [
-                'id' => ['type' => Type::nonNull(Type::string())],
-                'name' => ['type' => Type::nonNull(Type::string())],
-                'brand' => ['type' => Type::nonNull(Type::string())],
-                'description' => ['type' => Type::string()],
-                'category' => ['type' => Type::nonNull(Type::string())],
-                'inStock' => ['type' => Type::nonNull(Type::boolean())],
-                'type' => ['type' => Type::nonNull(Type::string())],
-                'hasConfigurableOptions' => ['type' => Type::nonNull(Type::boolean())],
-                'gallery' => ['type' => Type::listOf(Type::string())],
-                'prices' => ['type' => Type::listOf(self::getPriceType())],
-                'attributes' => ['type' => Type::listOf(self::getAttributeType())],
-                'availableOptions' => [
-                    'type' => Type::listOf(Type::string()),
-                    'description' => 'Available options for configurable products',
+                'id' => [
+                    'type' => Type::nonNull(Type::string()),
                     'resolve' => function($product) {
-                        return $product->getAvailableOptions();
+                        return $product->getId();
+                    }
+                ],
+                'name' => [
+                    'type' => Type::nonNull(Type::string()),
+                    'resolve' => function($product) {
+                        return $product->getName();
+                    }
+                ],
+                'brand' => [
+                    'type' => Type::nonNull(Type::string()),
+                    'resolve' => function($product) {
+                        return $product->getBrand();
+                    }
+                ],
+                'description' => [
+                    'type' => Type::string(),
+                    'resolve' => function($product) {
+                        return $product->getDescription();
+                    }
+                ],
+                'category' => [
+                    'type' => Type::nonNull(Type::string()),
+                    'resolve' => function($product) {
+                        return $product->getCategory();
+                    }
+                ],
+                'inStock' => [
+                    'type' => Type::nonNull(Type::boolean()),
+                    'resolve' => function($product) {
+                        return $product->isInStock();
+                    }
+                ],
+                'gallery' => [
+                    'type' => Type::listOf(Type::string()),
+                    'resolve' => function($product) {
+                        return $product->getGallery();
+                    }
+                ],
+                'prices' => [
+                    'type' => Type::listOf(self::getPriceType()),
+                    'resolve' => function($product) {
+                        $prices = $product->getPrices();
+                        return is_array($prices) ? $prices : [];
+                    }
+                ],
+                'attributes' => [
+                    'type' => Type::listOf(self::getAttributeType()),
+                    'resolve' => function($product) {
+                        $attributes = $product->getAttributes();
+                        return is_array($attributes) ? $attributes : [];
                     }
                 ]
             ]
@@ -242,10 +316,63 @@ class GraphQL
             'name' => 'Attribute',
             'description' => 'Product attribute',
             'fields' => [
-                'id' => ['type' => Type::nonNull(Type::string())],
-                'name' => ['type' => Type::nonNull(Type::string())],
-                'type' => ['type' => Type::nonNull(Type::string())],
-                'items' => ['type' => Type::listOf(Type::string())]
+                'id' => [
+                    'type' => Type::nonNull(Type::string()),
+                    'resolve' => function($attribute) {
+                        return isset($attribute['id']) ? (string)$attribute['id'] : '';
+                    }
+                ],
+                'name' => [
+                    'type' => Type::nonNull(Type::string()),
+                    'resolve' => function($attribute) {
+                        return isset($attribute['name']) ? (string)$attribute['name'] : '';
+                    }
+                ],
+                'type' => [
+                    'type' => Type::nonNull(Type::string()),
+                    'resolve' => function($attribute) {
+                        return isset($attribute['type']) ? (string)$attribute['type'] : '';
+                    }
+                ],
+                'items' => [
+                    'type' => Type::listOf(self::getAttributeItemType()),
+                    'resolve' => function($attribute) {
+                        return isset($attribute['items']) && is_array($attribute['items']) ? $attribute['items'] : [];
+                    }
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * Define AttributeItem GraphQL type
+     * 
+     * @return ObjectType AttributeItem GraphQL type definition
+     */
+    private static function getAttributeItemType(): ObjectType
+    {
+        return new ObjectType([
+            'name' => 'AttributeItem',
+            'description' => 'Product attribute item',
+            'fields' => [
+                'id' => [
+                    'type' => Type::string(),
+                    'resolve' => function($item) {
+                        return isset($item['id']) ? (string)$item['id'] : null;
+                    }
+                ],
+                'display_value' => [
+                    'type' => Type::nonNull(Type::string()),
+                    'resolve' => function($item) {
+                        return $item['display_value'] ?? $item['displayValue'] ?? '';
+                    }
+                ],
+                'value' => [
+                    'type' => Type::nonNull(Type::string()),
+                    'resolve' => function($item) {
+                        return isset($item['value']) ? (string)$item['value'] : '';
+                    }
+                ]
             ]
         ]);
     }
@@ -261,15 +388,44 @@ class GraphQL
             'name' => 'Price',
             'description' => 'Product price with currency',
             'fields' => [
-                'amount' => ['type' => Type::nonNull(Type::float())],
+                'amount' => [
+                    'type' => Type::nonNull(Type::float()),
+                    'resolve' => function($price) {
+                        return isset($price['amount']) ? (float)$price['amount'] : 0.0;
+                    }
+                ],
                 'currency' => [
-                    'type' => new ObjectType([
-                        'name' => 'Currency',
-                        'fields' => [
-                            'label' => ['type' => Type::nonNull(Type::string())],
-                            'symbol' => ['type' => Type::nonNull(Type::string())]
-                        ]
-                    ])
+                    'type' => self::getCurrencyType(),
+                    'resolve' => function($price) {
+                        return isset($price['currency']) && is_array($price['currency']) ? $price['currency'] : ['label' => '', 'symbol' => ''];
+                    }
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * Define Currency GraphQL type
+     * 
+     * @return ObjectType Currency GraphQL type definition
+     */
+    private static function getCurrencyType(): ObjectType
+    {
+        return new ObjectType([
+            'name' => 'Currency',
+            'description' => 'Currency information',
+            'fields' => [
+                'label' => [
+                    'type' => Type::nonNull(Type::string()),
+                    'resolve' => function($currency) {
+                        return isset($currency['label']) ? (string)$currency['label'] : '';
+                    }
+                ],
+                'symbol' => [
+                    'type' => Type::nonNull(Type::string()),
+                    'resolve' => function($currency) {
+                        return isset($currency['symbol']) ? (string)$currency['symbol'] : '';
+                    }
                 ]
             ]
         ]);
