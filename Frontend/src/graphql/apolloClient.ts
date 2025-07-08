@@ -1,7 +1,10 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client'
 
+// Use environment variable for API URL, fallback to localhost for development
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/graphql'
+
 const httpLink = createHttpLink({
-  uri: 'http://localhost:8000/graphql',
+  uri: apiUrl,
   credentials: 'same-origin',
 })
 
