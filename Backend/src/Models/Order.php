@@ -288,10 +288,7 @@ abstract class Order
         ]);
         
         if ($result) {
-            $row = Database::fetchOne("SELECT LAST_INSERT_ID() as id");
-            if ($row) {
-                $this->id = (int) $row['id'];
-            }
+            $this->id = (int) Database::getLastInsertId();
         }
         
         return $result;

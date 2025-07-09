@@ -11,6 +11,8 @@ use App\Models\Attribute;
 use App\Models\AttributeItem;
 use App\Models\Price;
 use App\Models\Gallery;
+use App\Repositories\CategoryRepository;
+use App\Repositories\ProductRepository;
 
 /**
  * Database Import Service
@@ -24,9 +26,15 @@ class DatabaseImporter
 {
     private array $data;
     private int $importedCount = 0;
+    private CategoryRepository $categoryRepository;
+    private ProductRepository $productRepository;
+    private bool $forceReimport = false;
 
-    public function __construct()
+    public function __construct(bool $forceReimport = false)
     {
+        $this->forceReimport = $forceReimport;
+        $this->categoryRepository = new CategoryRepository();
+        $this->productRepository = new ProductRepository();
         $this->loadDataFromJson();
     }
 
@@ -110,6 +118,12 @@ class DatabaseImporter
      */
     private function importSingleCategory(array $categoryData): void
     {
+        // Check if category already exists (only skip if not forcing reimport)
+        if (!$this->forceReimport && $this->categoryRepository->exists($categoryData['name'])) {
+            $this->log("→ Category '{$categoryData['name']}' already exists, skipping");
+            return;
+        }
+        
         $category = Category::create($categoryData['name']);
         
         if ($category->save()) {
@@ -126,12 +140,13 @@ class DatabaseImporter
     private function importProducts(): void
     {
         $products = $this->data['data']['products'] ?? [];
+        $this->log("Found " . count($products) . " products to import");
         
         foreach ($products as $productData) {
             $this->importSingleProduct($productData);
         }
         
-        $this->log("Imported " . count($products) . " products");
+        $this->log("Processed " . count($products) . " products");
     }
 
     /**
@@ -139,6 +154,14 @@ class DatabaseImporter
      */
     private function importSingleProduct(array $productData): void
     {
+        // Check if product already exists (only skip if not forcing reimport)
+        if (!$this->forceReimport && $this->productRepository->findById($productData['id']) !== null) {
+            $this->log("→ Product '{$productData['name']}' already exists, skipping");
+            return;
+        }
+        
+        $this->log("Importing product: " . $productData['name'] . " (ID: " . $productData['id'] . ")");
+        
         // Create product using factory pattern (polymorphism)
         $product = Product::create($productData);
         

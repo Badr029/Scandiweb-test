@@ -1,8 +1,3 @@
--- Database Schema for Scandiweb Fullstack Test
--- Based on data.json structure
-
-CREATE DATABASE IF NOT EXISTS scandiweb_test;
-USE scandiweb_test;
 
 -- Drop existing tables in correct order (child tables first, then parent tables)
 DROP TABLE IF EXISTS order_items;

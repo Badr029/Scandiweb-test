@@ -144,11 +144,8 @@ abstract class Category
         $result = Database::execute($sql, [$this->name]);
         
         if ($result) {
-            // Get the last inserted ID
-            $row = Database::fetchOne("SELECT LAST_INSERT_ID() as id");
-            if ($row) {
-                $this->id = (int) $row['id'];
-            }
+            // Get the last inserted ID using the proper method
+            $this->id = (int) Database::getLastInsertId();
         }
         
         return $result;

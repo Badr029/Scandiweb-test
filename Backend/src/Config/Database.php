@@ -19,12 +19,27 @@ class Database
 {
     private static ?PDO $connection = null;
     
-    // InfinityFree Production Database Configuration
-    private static string $host = 'sql309.infinityfree.com';
-    private static string $database = 'if0_39425959_scandiweb_test';
-    private static string $username = 'if0_39425959';
-    private static string $password = 'HgSNp9Ng4RgazJ'; 
-    private static int $port = 3306; // Standard MySQL port
+    // InfinityFree Database Configuration
+    // ===============================================
+    // IMPORTANT: Replace these placeholder values with your ACTUAL InfinityFree database details
+    // 
+    // To find your credentials:
+    // 1. Login to InfinityFree VistaPanel
+    // 2. Go to "MySQL Databases" 
+    // 3. Copy the exact values shown there
+    // 
+    // Example of what you might see:
+    // Host: sql205.infinityfree.com
+    // Database: if0_37491652_scandiweb  
+    // Username: if0_37491652
+    // Password: YourChosenPassword123
+    // ===============================================
+    
+    private static string $host = 'sql309.infinityfree.com';           // InfinityFree SQL host
+    private static string $database = 'if0_39425959_scandiweb_test';   // InfinityFree database name
+    private static string $username = 'if0_39425959';                  // InfinityFree username
+    private static string $password = 'HgSNp9Ng4RgazJ';                // InfinityFree password
+    private static int $port = 3306;                                   // Keep as 3306
 
     /**
      * Get database connection instance

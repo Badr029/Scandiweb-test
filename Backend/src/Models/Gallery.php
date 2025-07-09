@@ -91,8 +91,31 @@ class Gallery
     {
         return !empty($this->productId) && 
                !empty($this->imageUrl) && 
-               filter_var($this->imageUrl, FILTER_VALIDATE_URL) !== false &&
+               $this->isValidUrl($this->imageUrl) &&
                $this->sortOrder >= 0;
+    }
+
+    /**
+     * More robust URL validation that doesn't hang
+     */
+    private function isValidUrl(string $url): bool
+    {
+        // Basic URL structure check without using filter_var which can hang
+        if (empty($url)) {
+            return false;
+        }
+        
+        // Check for basic URL structure
+        if (!preg_match('/^https?:\/\/.+/', $url)) {
+            return false;
+        }
+        
+        // Ensure it's not too long (filter_var can hang on very long URLs)
+        if (strlen($url) > 2000) {
+            return false;
+        }
+        
+        return true;
     }
 
     /**
@@ -168,7 +191,7 @@ class Gallery
      */
     public function isValidImageUrl(): bool
     {
-        if (!filter_var($this->imageUrl, FILTER_VALIDATE_URL)) {
+        if (!$this->isValidUrl($this->imageUrl)) {
             return false;
         }
 
