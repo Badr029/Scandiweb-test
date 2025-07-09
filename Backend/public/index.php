@@ -3,11 +3,12 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // CORS Configuration for Production Deployment
-// Production Vercel URL: https://scandiweb-test-badrs-projects-6643e546.vercel.app
+// Updated Vercel URL: https://scandiweb-test-gilt.vercel.app
 $allowedOrigins = [
     'http://localhost:3000',        // Development
     'http://localhost:5173',        // Vite dev server
-    'https://scandiweb-test-badrs-projects-6643e546.vercel.app', // Production Vercel
+    'https://scandiweb-test-gilt.vercel.app', // Production Vercel (NEW URL)
+    'https://scandiweb-test-badrs-projects-6643e546.vercel.app', // Backup Vercel URL
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -15,8 +16,8 @@ if (in_array($origin, $allowedOrigins)) {
     header("Access-Control-Allow-Origin: $origin");
     header("Access-Control-Allow-Credentials: true");
 } else {
-    // Production fallback - only allow Vercel domain
-    header("Access-Control-Allow-Origin: https://scandiweb-test-badrs-projects-6643e546.vercel.app");
+    // Production fallback - allow new Vercel domain
+    header("Access-Control-Allow-Origin: https://scandiweb-test-gilt.vercel.app");
     header("Access-Control-Allow-Credentials: false");
 }
 
