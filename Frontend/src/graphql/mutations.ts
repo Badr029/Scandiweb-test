@@ -1,12 +1,14 @@
 import { gql } from '@apollo/client'
 
 export const PLACE_ORDER = gql`
-  mutation PlaceOrder($products: [OrderProductInput!]!) {
-    placeOrder(products: $products) {
+  mutation PlaceOrder($items: [String!]!, $totalAmount: Float!, $customerEmail: String) {
+    placeOrder(items: $items, totalAmount: $totalAmount, customerEmail: $customerEmail) {
       id
       status
-      total
-      created_at
+      totalAmount
+      currency
+      customerEmail
+      createdAt
     }
   }
 ` 

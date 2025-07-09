@@ -43,15 +43,16 @@ const CartOverlay: React.FC = () => {
     if (cartItems.length === 0 || orderLoading) return
 
     try {
-      const orderProducts: OrderProductInput[] = cartItems.map(item => ({
-        product_id: item.product.id,
-        quantity: item.quantity,
-        selected_attributes: item.selectedAttributes
-      }))
+      // Convert cart items to simple string array for backend
+      const orderItems = cartItems.map(item => 
+        `${item.product.id}:${item.quantity}:${JSON.stringify(item.selectedAttributes)}`
+      )
 
       await placeOrderMutation({
         variables: {
-          products: orderProducts
+          items: orderItems,
+          totalAmount: totalAmount,
+          customerEmail: null // Could be made configurable later
         }
       })
 

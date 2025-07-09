@@ -2,8 +2,43 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// Add CORS headers to allow frontend access
-header("Access-Control-Allow-Origin: https://scandiweb-test-mohamedbadr.web1337.net");
+// Get the origin of the request
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+// Allow requests from InfinityFree domains and localhost for development
+$allowedOrigins = [
+    'https://scandiweb-test-mohamedbadr.web1337.net',
+    'https://mohamedbadr.web1337.net',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+];
+
+// Check if origin contains infinityfree domains or is in allowed list
+$isAllowed = false;
+foreach ($allowedOrigins as $allowedOrigin) {
+    if ($origin === $allowedOrigin) {
+        $isAllowed = true;
+        break;
+    }
+}
+
+// Also allow any infinityfree subdomain
+if (!$isAllowed && preg_match('/^https?:\/\/[^\/]+\.infinityfreeapp\.com$/', $origin)) {
+    $isAllowed = true;
+}
+
+// Also allow any web1337.net subdomain (InfinityFree)
+if (!$isAllowed && preg_match('/^https?:\/\/[^\/]+\.web1337\.net$/', $origin)) {
+    $isAllowed = true;
+}
+
+if ($isAllowed) {
+    header("Access-Control-Allow-Origin: $origin");
+} else {
+    // Fallback - allow all for compatibility (can be restricted later)
+    header("Access-Control-Allow-Origin: *");
+}
+
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Access-Control-Allow-Credentials: true");

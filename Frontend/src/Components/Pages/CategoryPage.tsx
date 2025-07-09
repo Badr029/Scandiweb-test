@@ -10,7 +10,6 @@ const CategoryPage: React.FC = () => {
   const { categoryName } = useParams<{ categoryName?: string }>()
   const { data, loading, error } = useQuery(GET_PRODUCTS)
 
-  if (loading) return <div className="loading">Loading...</div>
   if (error) return <div className="error">Error loading products: {error.message}</div>
 
   const products: Product[] = data?.products || []
@@ -31,9 +30,12 @@ const CategoryPage: React.FC = () => {
             product={product} 
           />
         ))}
+        {loading && (
+          <div className="loading-placeholder">Loading products...</div>
+        )}
       </div>
 
-      {filteredProducts.length === 0 && (
+      {!loading && filteredProducts.length === 0 && (
         <div className="no-products">
           No products found in this category.
         </div>
