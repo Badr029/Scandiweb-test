@@ -3,24 +3,27 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // CORS Configuration for Production Deployment
-// Update the Vercel URL below after you deploy to Vercel
+// Production Vercel URL: https://scandiweb-test-badrs-projects-6643e546.vercel.app
 $allowedOrigins = [
     'http://localhost:3000',        // Development
     'http://localhost:5173',        // Vite dev server
-    'https://scandiweb-test.vercel.app', // TODO: Update with your actual Vercel URL
+    'https://scandiweb-test-badrs-projects-6643e546.vercel.app', // Production Vercel
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if (in_array($origin, $allowedOrigins)) {
     header("Access-Control-Allow-Origin: $origin");
+    header("Access-Control-Allow-Credentials: true");
 } else {
-    // Fallback for testing - remove in production
-    header("Access-Control-Allow-Origin: *");
+    // Production fallback - only allow Vercel domain
+    header("Access-Control-Allow-Origin: https://scandiweb-test-badrs-projects-6643e546.vercel.app");
+    header("Access-Control-Allow-Credentials: false");
 }
 
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Max-Age: 3600");
+header("Content-Type: application/json");
 
 // Handle preflight OPTIONS requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

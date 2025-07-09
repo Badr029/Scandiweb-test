@@ -23,7 +23,7 @@ class Database
     private static string $host = 'sql309.infinityfree.com';
     private static string $database = 'if0_39425959_scandiweb_test';
     private static string $username = 'if0_39425959';
-    private static string $password = 'YOUR_VPANEL_PASSWORD'; // TODO: Replace with your actual vPanel password
+    private static string $password = 'HgSNp9Ng4RgazJ'; 
     private static int $port = 3306; // Standard MySQL port
 
     /**
