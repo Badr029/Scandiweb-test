@@ -10,7 +10,11 @@ $allowedOrigins = [
     'https://scandiweb-test-mohamedbadr.web1337.net',
     'https://mohamedbadr.web1337.net',
     'http://localhost:3000',
-    'http://127.0.0.1:3000'
+    'http://127.0.0.1:3000',
+    // Vercel deployment URLs
+    'https://scandiweb-test-gilt.vercel.app',
+    'https://scandiweb-test-badrs-projects-6643e546.vercel.app',
+    'https://scandiweb-test-git-main-badrs-projects-6643e546.vercel.app'
 ];
 
 // Check if origin contains infinityfree domains or is in allowed list
