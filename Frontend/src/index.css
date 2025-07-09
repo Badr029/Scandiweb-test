@@ -6,6 +6,12 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden; /* Prevent horizontal scroll on the page */
+  -webkit-text-size-adjust: 100%; /* Prevent iOS text scaling */
+  -ms-text-size-adjust: 100%; /* Prevent Windows Mobile text scaling */
+}
+
 body {
   font-family: 'Raleway', sans-serif;
   font-size: 16px;
@@ -14,10 +20,17 @@ body {
   background-color: #ffffff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 #root {
-  min-height: 100vh;
+  width: 100%;
+  height: auto; /* Let it take natural height of content */
+  position: relative;
+  overflow-x: hidden;
 }
 
 a {
@@ -45,6 +58,49 @@ img {
 input, select, textarea {
   font-family: inherit;
   font-size: inherit;
+}
+
+/* Mobile touch-friendly enhancements */
+@media (max-width: 768px) {
+  /* Increase touch target sizes for mobile */
+  button, 
+  [role="button"],
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 44px; /* iOS Human Interface Guidelines minimum */
+    min-width: 44px;
+  }
+  
+  /* Responsive typography */
+  body {
+    font-size: 14px;
+  }
+  
+  /* Prevent zoom on input focus */
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+  }
+  
+  /* Further reduce sizes for very small screens */
+  button, 
+  [role="button"] {
+    min-height: 40px;
+    min-width: 40px;
+  }
+}
+
+/* Orientation change handling */
+@media (orientation: landscape) and (max-height: 500px) {
+  /* Optimize for mobile landscape */
+  body {
+    font-size: 12px;
+  }
 }
 
 /* Custom scrollbar for webkit browsers */

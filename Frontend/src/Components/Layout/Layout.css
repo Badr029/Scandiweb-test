@@ -1,7 +1,8 @@
 .layout {
-  min-height: 100vh;
+  min-height: 100%; /* Take at least full height of parent, expand with content */
   display: flex;
   flex-direction: column;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 .main-content {
@@ -17,4 +18,24 @@
 .main-content.cart-overlay-open {
   opacity: 0.5;
   pointer-events: none;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 0 4%; /* Reduced padding for mobile */
+    max-width: 100%; /* Full width on mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 0 3%; /* Even less padding for small screens */
+  }
+}
+
+@media (max-width: 320px) {
+  .main-content {
+    padding: 0 2%; /* Minimal padding for very small screens */
+  }
 } 
