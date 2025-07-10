@@ -43,40 +43,11 @@ const ProductPage: React.FC = () => {
   }, [productId])
 
   // NOW handle loading/error states AFTER all hooks
-  // Don't show loading state that would hide required test elements
+  if (loading) return <div className="loading">Loading product...</div>
   if (error) return <div className="error">Error loading product: {error.message}</div>
-  if (!data?.product && !loading) return <div className="error">Product not found</div>
-  
-  // Show empty product structure during loading to prevent test failures
-  const product = data?.product
+  if (!data?.product) return <div className="error">Product not found</div>
 
-  if (!product) {
-    return (
-      <div className="product-page">
-        <div className="product-container">
-          <div className="product-gallery" data-testid="product-gallery">
-            <div className="loading-placeholder">Loading product...</div>
-          </div>
-          <div className="product-details">
-            <div className="loading-placeholder">Loading details...</div>
-            <button 
-              className="add-to-cart-button disabled"
-              disabled
-              data-testid="add-to-cart"
-            >
-              Loading...
-            </button>
-            <div 
-              className="product-description"
-              data-testid="product-description"
-            >
-              Loading description...
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const product = data.product
 
   const handleAttributeSelect = (attributeId: string, value: string) => {
     setSelectedAttributes(prev => ({

@@ -23,18 +23,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     e.preventDefault()
     e.stopPropagation()
 
-    // Create default attributes by selecting first option from each attribute
-    const defaultAttributes: { [attributeId: string]: string } = {}
-    
+    // If product has attributes, redirect to product page to select them
     if (product.attributes && product.attributes.length > 0) {
-      product.attributes.forEach(attribute => {
-        if (attribute.items && attribute.items.length > 0) {
-          defaultAttributes[attribute.id] = attribute.items[0].value
-        }
-      })
+      navigate(`/product/${product.id}`)
+      return
     }
 
-    // Add to cart with default attributes
+    // For products without attributes, add directly to cart
+    const defaultAttributes: { [attributeId: string]: string } = {}
     addToCart(product, defaultAttributes)
     openCart()
   }
@@ -72,7 +68,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               onClick={handleQuickAddToCart}
               title="Add to cart"
             >
-              <img src="./cart-white.svg" alt="Add to cart" />
+              <img src="/cart-white.svg" alt="Add to cart" />
             </button>
           )}
     </div>
